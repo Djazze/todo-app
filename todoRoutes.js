@@ -1,7 +1,5 @@
 const express = require('express');
 const router = express.Router();
-import axios from './axios-config';
-
 
 let todoItems = [];
 

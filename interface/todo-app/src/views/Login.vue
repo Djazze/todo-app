@@ -12,6 +12,8 @@
 </template>
   
 <script>
+import axios from '@/axios-config'; // Import your Axios configuration
+
 export default {
     data() {
         return {
@@ -21,24 +23,20 @@ export default {
     },
     methods: {
         async login() {
-            // Send login request to the backend
-            const response = await fetch('/api/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username: this.username, password: this.password })
-            });
+            try {
+                // Send login request to the backend
+                const response = await axios.post('/api/login', {
+                    username: this.username,
+                    password: this.password
+                });
 
-            // Handle response
-            if (response.ok) {
-                const data = await response.json();
                 // Store the token and navigate to the home page
-                localStorage.setItem('token', data.token);
+                localStorage.setItem('token', response.data.token);
                 this.$router.push('/');
-            } else {
+            } catch (error) {
                 // Handle error (e.g., show an error message)
             }
         }
     }
 };
 </script>
-  
