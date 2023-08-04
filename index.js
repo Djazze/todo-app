@@ -5,6 +5,15 @@ const port = 3000;
 const app = express();
 const todoRoutes = require('./todoRoutes'); // Import the todo routes
 const authRoutes = require('./authRoutes'); // Import the authentication routes
+const session = require('express-session');
+
+// Configure session middleware
+app.use(session({
+    secret: 'your-secret-key',
+    resave: false,
+    saveUninitialized: false,
+    // Other options as needed
+}));
 
 // Database connection (if you've moved this to a separate file)
 require('./db');

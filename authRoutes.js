@@ -1,33 +1,30 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const users = require('./userModel');
+const users = require('./models/User');
 const router = express.Router();
-import axios from './axios-config';
-
+const User = require('./models/User');
 
 // Registration endpoint
-router.post('/api/register', (req, res) => {
+router.post('/api/register', async (req, res) => {
+  try {
     const { username, password } = req.body;
 
-    // Validate input (you can add more validation logic here)
-    if (!username || !password) {
-        return res.status(400).json({ error: 'Username and password are required' });
-    }
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Check if the user already exists
-    users.findByUsername(username, (err, results) => {
-        if (err) throw err;
-        if (results.length > 0) {
-            return res.status(409).json({ error: 'Username already exists' });
-        }
-
-        // Create the user
-        users.create(username, password, (err, results) => {
-            if (err) throw err;
-            res.json({ message: 'User registered successfully' });
-        });
+    // Create the user
+    const user = await User.create({
+      username,
+      password: hashedPassword
     });
+
+    // Respond with success
+    res.status(200).json({ message: 'User registered successfully' });
+  } catch (error) {
+    // Handle error (e.g., username already exists)
+    res.status(400).json({ error: error.message });
+  }
 });
 
 // Login endpoint
