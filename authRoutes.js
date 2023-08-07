@@ -4,7 +4,8 @@ const bcrypt = require('bcrypt');
 const users = require('./models/User');
 const router = express.Router();
 const User = require('./models/User');
-
+require('dotenv').config();
+const secretKey = process.env.SECRET_KEY;
 
 // Registration endpoint
 router.post('/api/register', async (req, res) => {
@@ -52,7 +53,7 @@ router.post('/api/login', async (req, res) => {
 
     // Check if the user exists and the password is correct
     if (user && bcrypt.compareSync(password, user.password)) {
-      const token = jwt.sign({ username: user.username }, 'SECRET_KEY', { expiresIn: '1h' });
+      const token = jwt.sign({ username: user.username }, secretKey, { expiresIn: '1h' });
       res.json({ token });
     } else {
       res.status(401).json({ error: 'Invalid username or password' });

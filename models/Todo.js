@@ -1,6 +1,6 @@
 const { Sequelize, DataTypes } = require('sequelize');
-const sequelize = require('../db.js'); // Update with the correct path
-const User = require('./User.js'); // Update with the correct path
+const sequelize = require('../db.js');
+const User = require('./User.js'); 
 
 const Todo = sequelize.define('Todo', {
     id: {
@@ -24,10 +24,11 @@ const Todo = sequelize.define('Todo', {
         },
         allowNull: false
     }
-});
-
-// Define the relationship between User and Todo
-User.hasMany(Todo, { foreignKey: 'userId' });
-Todo.belongsTo(User, { foreignKey: 'userId' });
+},
+{
+    sequelize,
+    modelName: 'Todo',
+    timestamps: false, // Disable timestamps
+  });
 
 module.exports = Todo;

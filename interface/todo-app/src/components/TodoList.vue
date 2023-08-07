@@ -18,7 +18,6 @@
 
 <script>
 import axios from 'axios';
-import { authenticateJWT } from '@../../../authenticateJWT.js';
 axios.defaults.baseURL = 'http://localhost:3000';
 
 export default {
@@ -34,7 +33,13 @@ export default {
   },
   methods: {
     fetchTodos() {
-      axios.get('/api/todo', { headers: authenticateJWT() })
+      const token = localStorage.getItem('token');
+
+      axios.get('/api/todo', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
         .then((response) => {
           this.todos = response.data;
         })
@@ -43,7 +48,9 @@ export default {
         });
     },
     addTodo() {
-      axios.post('/api/todo', { task: this.newTodo }, { headers: authenticateJWT() })
+      const token = localStorage.getItem('token');
+
+      axios.post('/api/todo', { task: this.newTodo }, { headers: {'Authorization': `Bearer ${token}`}})
         .then((response) => {
           this.todos.push(response.data);
           this.newTodo = '';
@@ -53,9 +60,10 @@ export default {
         });
     },
     updateTodo(todo) {
+      const token = localStorage.getItem('token');
       const updatedTask = prompt('Enter the updated task:', todo.task);
       if (updatedTask) {
-        axios.put(`/api/todo/${todo._id}`, { task: updatedTask }, { headers: authenticateJWT() })
+        axios.put(`/api/todo/${todo._id}`, { task: updatedTask }, { headers: {'Authorization': `Bearer ${token}`} })
           .then((response) => {
             const updatedTodoIndex = this.todos.findIndex((t) => t._id === todo._id);
             this.todos[updatedTodoIndex] = response.data;
@@ -66,8 +74,10 @@ export default {
       }
     },
     deleteTodo(todo) {
+      const token = localStorage.getItem('token');
+      
       if (confirm(`Are you sure you want to delete "${todo.task}"?`)) {
-        axios.delete(`/api/todo/${todo._id}`, { headers: authenticateJWT() })
+        axios.delete(`/api/todo/${todo._id}`, { headers: {'Authorization': `Bearer ${token}`}})
           .then(() => {
             this.todos = this.todos.filter((t) => t._id !== todo._id);
           })
