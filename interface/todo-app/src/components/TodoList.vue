@@ -47,10 +47,11 @@ export default {
           console.error('Error fetching to-do items:', error);
         });
     },
+
     addTodo() {
       const token = localStorage.getItem('token');
 
-      axios.post('/api/todo', { task: this.newTodo }, { headers: {'Authorization': `Bearer ${token}`}})
+      axios.post('/api/todo', { task: this.newTodo }, { headers: { 'Authorization': `Bearer ${token}` } })
         .then((response) => {
           this.todos.push(response.data);
           this.newTodo = '';
@@ -59,13 +60,14 @@ export default {
           console.error('Error adding a new to-do item:', error);
         });
     },
+
     updateTodo(todo) {
       const token = localStorage.getItem('token');
       const updatedTask = prompt('Enter the updated task:', todo.task);
       if (updatedTask) {
-        axios.put(`/api/todo/${todo._id}`, { task: updatedTask }, { headers: {'Authorization': `Bearer ${token}`} })
+        axios.put(`/api/todo/${todo.id}`, { task: updatedTask }, { headers: { 'Authorization': `Bearer ${token}` } })
           .then((response) => {
-            const updatedTodoIndex = this.todos.findIndex((t) => t._id === todo._id);
+            const updatedTodoIndex = this.todos.findIndex((t) => t.id === todo.id);
             this.todos[updatedTodoIndex] = response.data;
           })
           .catch((error) => {
@@ -73,11 +75,13 @@ export default {
           });
       }
     },
+
+
     deleteTodo(todo) {
       const token = localStorage.getItem('token');
-      
+
       if (confirm(`Are you sure you want to delete "${todo.task}"?`)) {
-        axios.delete(`/api/todo/${todo._id}`, { headers: {'Authorization': `Bearer ${token}`}})
+        axios.delete(`/api/todo/${todo._id}`, { headers: { 'Authorization': `Bearer ${token}` } })
           .then(() => {
             this.todos = this.todos.filter((t) => t._id !== todo._id);
           })

@@ -28,7 +28,7 @@ const Todo = sequelize.define('Todo', {
 {
     sequelize,
     modelName: 'Todo',
-    timestamps: false, // Disable timestamps
+    timestamps: true, 
   });
 
 module.exports = Todo;

@@ -53,7 +53,7 @@ router.post('/api/login', async (req, res) => {
 
     // Check if the user exists and the password is correct
     if (user && bcrypt.compareSync(password, user.password)) {
-      const token = jwt.sign({ username: user.username }, secretKey, { expiresIn: '1h' });
+      const token = jwt.sign({ id: user.id, username: user.username }, secretKey, { expiresIn: '1h' });
       res.json({ token });
     } else {
       res.status(401).json({ error: 'Invalid username or password' });
