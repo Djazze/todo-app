@@ -1,6 +1,6 @@
-const { Sequelize, DataTypes } = require('sequelize');
+const { DataTypes } = require('sequelize');
 const sequelize = require('../db.js');
-const User = require('./User.js'); 
+const User = require('./User.js');
 
 const Todo = sequelize.define('Todo', {
     id: {
@@ -23,12 +23,18 @@ const Todo = sequelize.define('Todo', {
             key: 'id'
         },
         allowNull: false
+    },
+    description: {
+        type: DataTypes.STRING, // New description field
+        allowNull: false,
+
     }
+
 },
-{
-    sequelize,
-    modelName: 'Todo',
-    timestamps: true, 
-  });
+    {
+        sequelize,
+        modelName: 'Todo',
+        timestamps: true,
+    });
 
 module.exports = Todo;

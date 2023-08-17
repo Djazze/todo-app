@@ -1,7 +1,6 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const users = require('./models/User');
 const router = express.Router();
 const User = require('./models/User');
 require('dotenv').config();
@@ -63,7 +62,5 @@ router.post('/api/login', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-
-// You can add more authentication-related endpoints here, such as registration
 
 module.exports = router;

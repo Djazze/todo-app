@@ -8,6 +8,7 @@ const authRoutes = require('./authRoutes'); // Import the authentication routes
 const session = require('express-session');
 require('dotenv').config();
 const secretKey = process.env.SECRET_KEY;
+const syncModels = require('./syncModels');
 
 // Configure session middleware
 app.use(session({
@@ -17,12 +18,12 @@ app.use(session({
     // Other options as needed
 }));
 
-const sequelize = require('./db');
-const User = require('./models/User');
-const Todo = require('./models/Todo');
+// const sequelize = require('./db');
+// const User = require('./models/User');
+// const Todo = require('./models/Todo');
 require('./models/relationships'); // Define the relationships
 
-sequelize.sync(); 
+syncModels();
 
 // Middleware Configuration
 app.use(bodyParser.json());
