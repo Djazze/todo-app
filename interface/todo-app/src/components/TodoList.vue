@@ -124,6 +124,7 @@ export default {
     return {
       todos: [], // To store the fetched to-do items
       newTodo: '', // To store the value of the new to-do item
+      description: '', // To store the value of the description input field
       isModalOpen: false, // To control whether the modal is open or closed
       taskDescription: '', // To store the description of the task to display in the modal
     };
@@ -178,6 +179,7 @@ export default {
         .then((response) => {
           this.todos.push(response.data);
           this.newTodo = '';
+          this.description = '';
         })
         .catch((error) => {
           if (error.response && error.response.status === 403) {
