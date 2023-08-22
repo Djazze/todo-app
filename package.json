@@ -30,6 +30,7 @@
     "node-polyfill-webpack-plugin": "^2.0.1",
     "sequelize": "^6.32.1",
     "stream-browserify": "^3.0.0",
-    "util": "^0.12.5"
+    "util": "^0.12.5",
+    "vue-router": "^4.2.4"
   }
 }

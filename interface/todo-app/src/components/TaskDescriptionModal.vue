@@ -1,34 +1,15 @@
 <template>
-  <div v-if="isOpen" class="modal" @click="closeOnOutsideClick">
+  <div :class="{ modal: true, 'modal-visible': isOpen }" @click="closeOnOutsideClick">
     <div class="modal-content">
       <span @click="closeModal" class="close-button">&times;</span>
       <h3>Task Description</h3>
-      <p>{{ description }}</p>
+      <p>{{ displayDescription }}</p>
     </div>
   </div>
 </template>
   
-<script>
-export default {
-  props: {
-    isOpen: Boolean,
-    description: String,
-  },
-  methods: {
-    closeOnOutsideClick(event) {
-    // Check if the click was outside the modal content
-    if (event.target.classList.contains('modal')) {
-      this.closeModal();
-    }
-  },
-    closeModal() {
-      this.$emit('close');
-    },
-  },
-};
-</script>
-  
 <style>
+/* Styles specific to this component */
 .modal {
   display: flex;
   justify-content: center;
@@ -42,7 +23,7 @@ export default {
 }
 
 .modal-content {
-  background-color: #ffffff;
+  background-color:#ffffff;
   padding: 20px;
   border-radius: 5px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -67,5 +48,41 @@ export default {
   right: 10px;
   cursor: pointer;
   font-size: 30px;
-}</style>
-  
+}
+
+.modal-visible {
+  opacity: 1;
+  visibility: visible;
+}
+</style>
+
+<script>
+export default {
+  props: {
+    isOpen: {
+      type: Boolean,
+      default: false
+    },
+    description: String,
+  },
+  computed: {
+    // Computed property to handle null or undefined description
+    displayDescription() {
+      return this.description || "This task has no description."; // Default message
+    },
+  },
+  methods: {
+    closeOnOutsideClick(event) {
+      // Check if the click was outside the modal content
+      if (event.target.classList.contains('modal')) {
+        this.closeModal();
+      }
+    },
+    closeModal() {
+      this.$emit('close');
+    },
+  },
+};
+</script>
+
+<style src="../style/common.css"></style>

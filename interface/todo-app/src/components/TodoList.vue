@@ -128,6 +128,8 @@ export default {
     openModalDesc(description) {
       this.isTaskDescriptionModalOpen = true; // Open TaskDescriptionModal
       this.taskDescription = description;
+      console.log(description);
+      console.log(this.isTaskDescriptionModalOpen);
     },
     closeAddTodoModal() {
       this.isAddTodoModalOpen = false; // Close AddTodoModal
@@ -164,19 +166,17 @@ export default {
         });
     },
 
-    addTodo() {
+    addTodo(todoDetails) {
       const token = localStorage.getItem('token');
       if (!token) {
         this.$router.push('/login'); // Redirect to /login using Vue Router
         return; // Exit the function early to prevent further execution
       }
 
-      axios.post('/api/todo', { task: this.newTodo, description: this.description }, { headers: { 'Authorization': `Bearer ${token}` } })
-        .then((response) => {
-          this.todos.push(response.data);
-          this.newTodo = '';
-          this.description = '';
-          this.closeAddTodoModal();
+      axios.post('/api/todo', { task: todoDetails.task, description: todoDetails.description }, { headers: { 'Authorization': `Bearer ${token}` } })
+      .then((response) => {
+        this.todos.push(response.data);
+        this.closeAddTodoModal();
         })
         .catch((error) => {
           if (error.response && error.response.status === 403) {

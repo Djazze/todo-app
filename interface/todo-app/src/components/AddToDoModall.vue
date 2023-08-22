@@ -1,7 +1,9 @@
+<style src="../style/common.css"></style>
+
 <template>
-    <div :class="{ modal: true, 'modal-visible': showModal }">
-        <div class="modal-content">
-            <span @click="closeModal" class="close">&times;</span>
+    <div :class="{ modal: true, 'modal-visible': showModal }" >
+        <div class="modal-content-common">
+            <span @click="closeModal" class="close-button-common">&times;</span>
             <h2>Add New To-Do</h2>
             <form @submit.prevent="addTodo">
                 <label for="task">Task:</label>
@@ -30,10 +32,10 @@ export default {
             this.$emit('close-modal');
         },
         addTodo() {
-            // Logic to add the to-do item
-            // Emit an event with the new to-do details
             this.$emit('add-todo', { task: this.task, description: this.description });
             this.closeModal();
+            this.task = ''; // Reset the task
+            this.description = ''; // Reset the description
         },
     },
 };

@@ -1,27 +1,19 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const port = 3000;
-const app = express();
-const todoRoutes = require('./todoRoutes'); // Import the todo routes
-const authRoutes = require('./authRoutes'); // Import the authentication routes
 const session = require('express-session');
-require('dotenv').config();
-const secretKey = process.env.SECRET_KEY;
 const syncModels = require('./syncModels');
+require('dotenv').config();
+
+const app = express();
+const port = 3000;
 
 // Configure session middleware
 app.use(session({
-    secret: secretKey,
+    secret: process.env.SECRET_KEY,
     resave: false,
     saveUninitialized: false,
-    // Other options as needed
 }));
-
-// const sequelize = require('./db');
-// const User = require('./models/User');
-// const Todo = require('./models/Todo');
-require('./models/relationships'); // Define the relationships
 
 syncModels();
 
@@ -29,9 +21,9 @@ syncModels();
 app.use(bodyParser.json());
 app.use(cors());
 
-// Use the imported routes
-app.use(todoRoutes);
-app.use(authRoutes);
+// Import and use the routes
+app.use(require('./todoRoutes'));
+app.use(require('./authRoutes'));
 
 // Start the server
 app.listen(port, () => {

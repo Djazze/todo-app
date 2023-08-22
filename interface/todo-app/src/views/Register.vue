@@ -1,5 +1,3 @@
-<!-- eslint-disable vue/multi-word-component-names -->
-<!-- src/views/Register.vue -->
 <template>
   <div>
     <h1>Register</h1>
@@ -8,8 +6,8 @@
       <input type="password" v-model="password" placeholder="Password" required />
       <button type="submit">Register</button>
     </form>
-    <p v-if="errorMessage" class="error">{{ errorMessage }}</p> <!-- Error message display -->
-    <p v-if="successMessage" class="success">{{ successMessage }}</p> <!-- Success message display -->
+    <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
+    <p v-if="successMessage" class="success">{{ successMessage }}</p>
   </div>
 </template>
 
@@ -17,35 +15,33 @@
 import axios from '@/axios-config';
 
 export default {
+  name: 'RegisterForm', // Updated component name
   data() {
     return {
       username: '',
       password: '',
-      errorMessage: '', // Error message state
-      successMessage: '' // Success message state
+      errorMessage: null,
+      successMessage: null
     };
   },
   methods: {
     async register() {
-      // Send registration request to the backend
       try {
         const response = await axios.post('/api/register', {
           username: this.username,
           password: this.password
         });
         if (response.status === 201) {
-          this.successMessage = "User registered successfully"; // Success message
+          this.successMessage = "User registered successfully";
           this.$router.push('/login');
         } else {
-          // Handle error (e.g., show an error message)
-          this.errorMessage = "An error occurred while registering."; // Example error message
+          this.errorMessage = "An error occurred while registering.";
         }
       } catch (error) {
-        // Handle error (e.g., show an error message)
         if (error.response && error.response.status === 400) {
-          this.errorMessage = "Username already exists."; // Specific error for duplicate username
+          this.errorMessage = "Username already exists.";
         } else {
-          this.errorMessage = "An error occurred while registering."; // General error message
+          this.errorMessage = "An error occurred while registering.";
         }
       }
     },

@@ -1,4 +1,3 @@
-<!-- eslint-disable vue/multi-word-component-names -->
 <!-- src/views/Login.vue -->
 <template>
     <div>
@@ -8,33 +7,37 @@
             <input type="password" v-model="password" placeholder="Password" required />
             <button type="submit">Login</button>
         </form>
+        <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
     </div>
 </template>
-  
+
 <script>
-import axios from '@/axios-config'; // Import your Axios configuration
+import axios from '@/axios-config';
 
 export default {
+    name: 'LoginForm',
     data() {
         return {
             username: '',
-            password: ''
+            password: '',
+            errorMessage: null
         };
     },
     methods: {
-        async login() {
+        login: async function () {
             try {
-                // Send login request to the backend
                 const response = await axios.post('/api/login', {
                     username: this.username,
                     password: this.password
                 });
-
-                // Store the token and navigate to the home page
                 localStorage.setItem('token', response.data.token);
                 this.$router.push('/');
             } catch (error) {
-                // Handle error (e.g., show an error message)
+                if (error.response && error.response.status === 401) {
+                    this.errorMessage = 'Invalid credentials';
+                } else {
+                    this.$router.push('/error'); // Redirect to an error page
+                }
             }
         }
     }
