@@ -1,30 +1,11 @@
-<!-- <template>
-  <div>
-    <h2>To-Do List</h2>
-    <div v-if="todos.length === 0">No to-do items yet.</div>
-    <ul v-else>
-      <li v-for="(todo, index) in todos" :key="index">
-        {{ todo.task }}
-        <button @click="updateTodo(todo)">Edit</button>
-        <button @click="deleteTodo(todo)">Delete</button>
-      </li>
-    </ul>
-    <form @submit.prevent="addTodo">
-      <input v-model="newTodo" type="text" placeholder="Enter a new task" />
-      <button type="submit">Add</button>
-    </form>
-  </div>
-</template> -->
-
 <template>
   <div class="container">
-    <!-- heading -->
     <h1 class="text-center">Todo App</h1>
-    <!-- input -->
     <div>
-      <input type="text" v-model="newTodo" placeholder="Enter a new task" required />
-      <input type="text" v-model="description" placeholder="Description" required />
-      <button class="add-btn" @click="addTodo" :disabled="!newTodo || !description">ADD</button>
+      <!-- <input type="text" v-model="newTodo" placeholder="Enter a new task" required /> -->
+      <!-- <input type="text" v-model="description" placeholder="Description" required /> -->
+      <!-- <button class="add-btn" @click="addTodo" :disabled="!newTodo || !description">ADD</button> -->
+      <button class="add-btn" @click="openModal">Add To-Do</button>
     </div>
 
     <!-- table -->
@@ -43,7 +24,7 @@
           <td>{{ todo.id }}</td>
           <td>{{ todo.task }}</td>
           <td>
-            <button class="view-desc-btn" @click="openModal(todo.description)">View Description</button>
+            <button class="view-desc-btn" @click="openModalDesc(todo.description)">View Description</button>
             <!-- New button -->
           </td>
           <td>
@@ -56,7 +37,9 @@
       </tbody>
     </table>
     <!-- Modal for viewing description -->
-    <TaskDescriptionModal :isOpen="isModalOpen" :description="taskDescription" @close="closeModal" />
+    <TaskDescriptionModal :isOpen="isTaskDescriptionModalOpen" :description="taskDescription"
+      @close="closeTaskDescriptionModal" />
+    <AddTodoModal :showModal="isAddTodoModalOpen" @closeModal="closeAddTodoModal" @add-todo="addTodo"></AddTodoModal>
   </div>
 </template>
 
@@ -111,12 +94,15 @@ tr:nth-child(even) {
 
 <script>
 import axios from 'axios';
+import AddTodoModal from './AddToDoModall.vue';
 import TaskDescriptionModal from './TaskDescriptionModal.vue'; // Import the modal component
+
 
 axios.defaults.baseURL = 'http://localhost:3000';
 
 export default {
   components: {
+    AddTodoModal,
     TaskDescriptionModal, // Register the modal component
   },
 
@@ -125,7 +111,8 @@ export default {
       todos: [], // To store the fetched to-do items
       newTodo: '', // To store the value of the new to-do item
       description: '', // To store the value of the description input field
-      isModalOpen: false, // To control whether the modal is open or closed
+      isAddTodoModalOpen: false, // Control variable for AddTodoModal
+      isTaskDescriptionModalOpen: false, // Control variable for TaskDescriptionModal
       taskDescription: '', // To store the description of the task to display in the modal
     };
   },
@@ -135,9 +122,18 @@ export default {
     this.fetchTodos();
   },
   methods: {
-    openModal(description) {
-      this.isModalOpen = true;
+    openModal() {
+      this.isAddTodoModalOpen = true; // Open AddTodoModal
+    },
+    openModalDesc(description) {
+      this.isTaskDescriptionModalOpen = true; // Open TaskDescriptionModal
       this.taskDescription = description;
+    },
+    closeAddTodoModal() {
+      this.isAddTodoModalOpen = false; // Close AddTodoModal
+    },
+    closeTaskDescriptionModal() {
+      this.isTaskDescriptionModalOpen = false; // Close TaskDescriptionModal
     },
     closeModal() {
       this.isModalOpen = false;
@@ -180,6 +176,7 @@ export default {
           this.todos.push(response.data);
           this.newTodo = '';
           this.description = '';
+          this.closeAddTodoModal();
         })
         .catch((error) => {
           if (error.response && error.response.status === 403) {
