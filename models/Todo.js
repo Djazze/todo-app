@@ -28,6 +28,15 @@ const Todo = sequelize.define('Todo', {
         type: DataTypes.STRING, // New description field
         allowNull: false,
 
+    },
+    column: {
+        type: DataTypes.STRING, // New column field
+        allowNull: true, // Assuming it's optional
+    },
+    status: {
+        type: DataTypes.ENUM('Pending', 'In Progress', 'Completed'), // New status field
+        defaultValue: 'Pending',
+        allowNull: false
     }
 
 },

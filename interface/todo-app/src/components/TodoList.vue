@@ -1,22 +1,16 @@
 <template>
   <div class="container">
     <h1 class="text-center">Todo App</h1>
-    <div>
-      <!-- <input type="text" v-model="newTodo" placeholder="Enter a new task" required /> -->
-      <!-- <input type="text" v-model="description" placeholder="Description" required /> -->
-      <!-- <button class="add-btn" @click="addTodo" :disabled="!newTodo || !description">ADD</button> -->
-      <button class="add-btn" @click="openModal">Add To-Do</button>
-    </div>
-
     <!-- table -->
     <table border="3">
       <thead>
         <tr>
           <th>ID</th>
           <th>Task</th>
-          <th>Description</th> <!-- New column for viewing description -->
+          <th>Description</th>
           <th>Delete</th>
           <th>Edit</th>
+          <th>Status</th> <!-- New column for Status -->
         </tr>
       </thead>
       <tbody>
@@ -25,7 +19,6 @@
           <td>{{ todo.task }}</td>
           <td>
             <button class="view-desc-btn" @click="openModalDesc(todo.description)">View Description</button>
-            <!-- New button -->
           </td>
           <td>
             <button class="del-btn" @click="deleteTodo(todo)">Delete</button>
@@ -33,9 +26,23 @@
           <td>
             <button class="edit-btn" @click="updateTodo(todo)">Edit</button>
           </td>
+          <td class="select-wrapper">
+            <select v-model="todo.status" @change="updateStatus(todo)" :style="getDropdownColor(todo.status)"
+              class="modern-select">
+              <option value="Pending">Pending</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Completed">Completed</option>
+            </select>
+          </td> <!-- New Status column with dropdown -->
         </tr>
       </tbody>
     </table>
+    <div>
+      <button class="add-btn" :class="{ 'hovered': isButtonHovered }" @mouseover="isButtonHovered = true"
+        @mouseout="isButtonHovered = false" @click="openModal">
+        Add To-Do
+      </button>
+    </div>
     <!-- Modal for viewing description -->
     <TaskDescriptionModal :isOpen="isTaskDescriptionModalOpen" :description="taskDescription"
       @close="closeTaskDescriptionModal" />
@@ -46,9 +53,45 @@
   
 <style scoped>
 .container {
-  width: 600px;
+  /* width: 600px; */
   margin: auto;
+}
 
+.select-wrapper {
+  position: relative;
+}
+
+.modern-select {
+  appearance: menulist-button;
+  outline: 0;
+  box-shadow: none;
+  border: 1px solid #ccc;
+  flex: 1;
+  padding: 0 1em;
+  color: #333;
+  background-color: #db4f4f;
+  color: #fff;
+  cursor: pointer;
+}
+
+.modern-select::before {
+  content: '\25BC';
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 0 1em;
+  background: #fff;
+  cursor: pointer;
+  pointer-events: none;
+  transition: 0.25s all ease;
+}
+
+.select-wrapper:hover .modern-select::before {
+  color: #888;
+}
+
+.hovered {
+  background-color: rgb(1, 102, 102) !important;
 }
 
 table {
@@ -71,11 +114,22 @@ tr:nth-child(even) {
 
 .add-btn {
   border: none;
-  width: 100px;
-  height: 30px;
-  padding: 2px;
+  width: 200px;
+  height: 60px;
+  padding: 2px 2px 2px 2px;
   background-color: teal;
   color: white;
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  border-radius: 5px;
+  margin-top: 10px;
+  margin-right: 10px;
+  cursor: pointer;
+  outline: none;
+  box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  font-size: 20px;
+  font-weight: bold;
 }
 
 .del-btn {
@@ -114,14 +168,25 @@ export default {
       isAddTodoModalOpen: false, // Control variable for AddTodoModal
       isTaskDescriptionModalOpen: false, // Control variable for TaskDescriptionModal
       taskDescription: '', // To store the description of the task to display in the modal
+      activeColumn: 'all',
+      isButtonHovered: false,
     };
   },
-
+  computed: {
+    // New computed property to filter todos based on the active column
+    filteredTodos() {
+      if (this.activeColumn === 'all') return this.todos;
+      return this.todos.filter(todo => todo.column === this.activeColumn);
+    }
+  },
   mounted() {
     // Fetch the to-do items from the backend API when the component is mounted
     this.fetchTodos();
   },
   methods: {
+    setActiveColumn(column) {
+      this.activeColumn = column;
+    },
     openModal() {
       this.isAddTodoModalOpen = true; // Open AddTodoModal
     },
@@ -174,9 +239,9 @@ export default {
       }
 
       axios.post('/api/todo', { task: todoDetails.task, description: todoDetails.description }, { headers: { 'Authorization': `Bearer ${token}` } })
-      .then((response) => {
-        this.todos.push(response.data);
-        this.closeAddTodoModal();
+        .then((response) => {
+          this.todos.push(response.data);
+          this.closeAddTodoModal();
         })
         .catch((error) => {
           if (error.response && error.response.status === 403) {
@@ -237,6 +302,39 @@ export default {
           .catch((error) => {
             console.error('Error deleting the to-do item:', error);
           });
+      }
+    },
+    async updateStatus(todo) {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        this.$router.push('/login');
+        return;
+      }
+      try {
+        const response = await axios.put(`/api/todo/${todo.id}`, { status: todo.status }, { headers: { 'Authorization': `Bearer ${token}` } });
+        const updatedTodoIndex = this.todos.findIndex((t) => t.id === response.data.id);
+        this.todos[updatedTodoIndex] = response.data;
+        this.todos = [...this.todos];
+      } catch (error) {
+        if (error.response && error.response.status === 403) {
+          this.showNotification('You are not authorized to update this to-do item.');
+          this.$router.push('/login');
+        } else {
+          console.error('Error updating the to-do item:', error);
+        }
+      }
+    },
+
+    getDropdownColor(status) {
+      switch (status) {
+        case 'Pending':
+          return { backgroundColor: '#f2d600', color: '#000' };
+        case 'In Progress':
+          return { backgroundColor: '#ff9f00', color: '#000' };
+        case 'Completed':
+          return { backgroundColor: '#4caf50', color: '#fff' };
+        default:
+          return {};
       }
     },
   },

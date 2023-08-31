@@ -5,7 +5,7 @@ const Todo = require('./models/Todo');
 
 // Get all to-do items
 router.get('/api/todo', authenticateJWT, async (req, res) => {
-  console.log('User in route handler:', req.user); // Log the user
+  // console.log('User in route handler:', req.user); // Log the user
   try {
     const todos = await Todo.findAll({ where: { userId: req.user.id } });
     res.json(todos);
@@ -17,7 +17,7 @@ router.get('/api/todo', authenticateJWT, async (req, res) => {
 
 // Create a new to-do item
 router.post('/api/todo', authenticateJWT, async (req, res) => {
-  const newTodo = await Todo.create({ ...req.body, userId: req.user.id });
+  const newTodo = await Todo.create({ ...req.body, userId: req.user.id, status: 'Pending' }); // Default to 'Pending'
   res.json(newTodo);
 });
 
@@ -25,14 +25,14 @@ router.post('/api/todo', authenticateJWT, async (req, res) => {
 router.put('/api/todo/:id', authenticateJWT, async (req, res) => {
   try {
     const { id: todoId } = req.params; // Get the id from the request parameters
-    const { task } = req.body; // Get the updated task from the request body
+    const { task, column, status } = req.body; // Get the updated task from the request body
     const { id: userId } = req.user; // Get the id from the authenticated user and rename it to userId
 
     console.log('User in route handler:', req.user.id); // Log the user
     console.log('userId in route handler:', userId); // Log the userId
 
     // Update the Todo instance with the given id and userId
-    await Todo.update({ task }, { where: { id: todoId, userId } });
+    await Todo.update({ task, column, status }, { where: { id: todoId, userId } });
 
     res.json({ message: 'Todo item updated successfully.' });
   } catch (err) {

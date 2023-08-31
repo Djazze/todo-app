@@ -1,15 +1,19 @@
 <style src="../style/common.css"></style>
 
 <template>
-    <div :class="{ modal: true, 'modal-visible': showModal }" >
+    <div :class="{ modal: true, 'modal-visible': showModal }">
         <div class="modal-content-common">
             <span @click="closeModal" class="close-button-common">&times;</span>
             <h2>Add New To-Do</h2>
             <form @submit.prevent="addTodo">
-                <label for="task">Task:</label>
-                <input type="text" v-model="task" id="task" required />
-                <label for="description">Description:</label>
-                <textarea v-model="description" id="description"></textarea>
+                <div class="form-group">
+                    <label for="task">Task:</label>
+                    <input type="text" v-model="task" id="task" required />
+                </div>
+                <div class="form-group">
+                    <label for="description">Description:</label>
+                    <textarea v-model="description" id="description"></textarea>
+                </div>
                 <button type="submit" :disabled="!task || !description">Add</button>
             </form>
         </div>
@@ -106,5 +110,17 @@ button:hover {
     opacity: 1;
     visibility: visible;
 }
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+label {
+  margin-bottom: 8px;
+}
+
+
 </style>
   
